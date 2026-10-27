@@ -225,14 +225,13 @@ textarea.modal-input { font-family: Consolas, 'Courier New', monospace; resize: 
 .ProseMirror pre { background: var(--code-bg); border-radius: 8px; padding: 12px 16px; overflow-x: auto; font-family: Consolas, monospace; font-size: 13px; line-height: 1.55; }
 .ProseMirror pre code { background: none; color: inherit; padding: 0; }
 .ProseMirror blockquote { border-left: 4px solid var(--border); margin: 0.6em 0; padding: 2px 14px; color: var(--text-2); }
-.ProseMirror blockquote.callout { border-left-color: #448aff; background: rgba(68, 138, 255, 0.08); border-radius: 6px; color: var(--text); padding: 8px 14px; }
-.ProseMirror blockquote.callout > p:first-child { font-weight: 600; color: #448aff; }
+.ProseMirror blockquote.callout { --callout-color: #448aff; border-left-color: #448aff; background: rgba(68, 138, 255, 0.08); border-radius: 6px; color: var(--text); padding: 8px 14px; }
 .ProseMirror blockquote.callout-tip, .ProseMirror blockquote.callout-success { border-left-color: #00b386; background: rgba(0, 179, 134, 0.08); }
-.ProseMirror blockquote.callout-tip > p:first-child, .ProseMirror blockquote.callout-success > p:first-child { color: #00a179; }
+.ProseMirror blockquote.callout-tip, .ProseMirror blockquote.callout-success { --callout-color: #00a179; }
 .ProseMirror blockquote.callout-warning, .ProseMirror blockquote.callout-question { border-left-color: #ec9a00; background: rgba(236, 154, 0, 0.08); }
-.ProseMirror blockquote.callout-warning > p:first-child, .ProseMirror blockquote.callout-question > p:first-child { color: #d08800; }
+.ProseMirror blockquote.callout-warning, .ProseMirror blockquote.callout-question { --callout-color: #d08800; }
 .ProseMirror blockquote.callout-danger, .ProseMirror blockquote.callout-bug, .ProseMirror blockquote.callout-error { border-left-color: #e5484d; background: rgba(229, 72, 77, 0.08); }
-.ProseMirror blockquote.callout-danger > p:first-child, .ProseMirror blockquote.callout-bug > p:first-child, .ProseMirror blockquote.callout-error > p:first-child { color: #e5484d; }
+.ProseMirror blockquote.callout-danger, .ProseMirror blockquote.callout-bug, .ProseMirror blockquote.callout-error { --callout-color: #e5484d; }
 .ProseMirror ul, .ProseMirror ol { padding-left: 1.6em; margin: 0.3em 0; }
 .ProseMirror li > p { margin: 0.1em 0; }
 .ProseMirror ul[data-type='taskList'] { list-style: none; padding-left: 0.2em; }
@@ -324,3 +323,6 @@ textarea.modal-input { font-family: Consolas, 'Courier New', monospace; resize: 
 .outline-item.l1 { font-weight: 600; color: var(--text); }
 .outline-item.l1.active { color: var(--accent); }
 .outline-empty { color: var(--text-2); padding: 4px 8px; font-size: 12px; }
+
+.callout-title { font-weight: 600; color: var(--callout-color); }
+.callout-marker { color: var(--callout-color); opacity: 0.55; font-size: 0.85em; font-family: Consolas, monospace; }

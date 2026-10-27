@@ -549,7 +549,18 @@ function buildDecorations(doc: PMNode): DecorationSet {
   doc.descendants((node, pos) => {
     if (node.type.name === 'blockquote') {
       const m = node.firstChild?.textContent.match(/^\[!([\w-]+)\]/)
-      if (m) decos.push(Decoration.node(pos, pos + node.nodeSize, { class: `callout callout-${m[1].toLowerCase()}` }))
+      const first = node.firstChild
+      if (m && first) {
+        decos.push(Decoration.node(pos, pos + node.nodeSize, { class: `callout callout-${m[1].toLowerCase()}` }))
+        // 标题只到首个换行为止；[!type] 标记弱化显示，正文保持普通样式
+        const start = pos + 2
+        let end = start + first.content.size
+        first.forEach((child, offset) => {
+          if (child.type.name === 'hardBreak' && end === start + first.content.size) end = start + offset
+        })
+        decos.push(Decoration.inline(start, start + m[0].length, { class: 'callout-marker' }))
+        if (end > start + m[0].length) decos.push(Decoration.inline(start + m[0].length, end, { class: 'callout-title' }))
+      }
     }
     if (node.isText && node.text && !node.marks.some((mk) => mk.type.name === 'code')) {
       for (const m of node.text.matchAll(/(^|\s)(#[\p{L}\p{N}_/-]*[\p{L}_/-][\p{L}\p{N}_/-]*)/gu)) {
