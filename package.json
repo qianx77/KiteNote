@@ -1,0 +1,93 @@
+{
+  "name": "labnote",
+  "productName": "LabNote",
+  "version": "0.1.0",
+  "description": "实验记录 + 每日/每周任务管理：To Do 式清单 + Obsidian 兼容的所见即所得 Markdown 笔记",
+  "main": "out/main/index.js",
+  "author": "qianx77@126.com",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "dist": "electron-vite build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "@tiptap/core": "2.27.3",
+    "@tiptap/extension-code": "2.27.3",
+    "@tiptap/extension-color": "2.27.3",
+    "@tiptap/extension-hard-break": "2.27.3",
+    "@tiptap/extension-highlight": "2.27.3",
+    "@tiptap/extension-image": "2.27.3",
+    "@tiptap/extension-link": "2.27.3",
+    "@tiptap/extension-placeholder": "2.27.3",
+    "@tiptap/extension-table": "2.27.3",
+    "@tiptap/extension-table-cell": "2.27.3",
+    "@tiptap/extension-table-header": "2.27.3",
+    "@tiptap/extension-table-row": "2.27.3",
+    "@tiptap/extension-task-item": "2.27.3",
+    "@tiptap/extension-task-list": "2.27.3",
+    "@tiptap/extension-text": "2.27.3",
+    "@tiptap/extension-text-style": "2.27.3",
+    "@tiptap/extension-underline": "2.27.3",
+    "@tiptap/pm": "2.27.3",
+    "@tiptap/react": "2.27.3",
+    "@tiptap/starter-kit": "2.27.3",
+    "@tiptap/suggestion": "2.27.3",
+    "katex": "0.16.11",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tiptap-markdown": "0.8.10"
+  },
+  "devDependencies": {
+    "@types/katex": "0.16.7",
+    "@types/node": "20.17.10",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8",
+    "electron-vite": "2.3.0",
+    "jsdom": "25.0.1",
+    "playwright-core": "^1.49.1",
+    "typescript": "5.6.3",
+    "vite": "5.4.11",
+    "vitest": "2.1.8"
+  },
+  "build": {
+    "appId": "com.labnote.app",
+    "productName": "LabNote",
+    "electronDist": "node_modules/electron/dist",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    }
+  }
+}
