@@ -23,7 +23,8 @@ LabNote puts all three in one window **without inventing a new format**: tasks a
 | | |
 | --- | --- |
 | **Daily / weekly tasks** | "My Day", "This Week", "Open tasks"; importance ⭐, sub-steps, notes, move to tomorrow, carry over yesterday's unfinished items, one-click weekly report |
-| **Task → work note** | One click creates a note from a template (Goal / Method / Config / Log / Results / Conclusion) and links it to the task with a `[[wikilink]]`; the note links back |
+| **Task → work note** | One click, pick a template, and a note is created and linked to the task with a `[[wikilink]]`; the note links back |
+| **Templates** | Built-in templates: Experiment / Troubleshooting / Meeting / General work log. Every note in the vault's template folder is a template (same name overrides a built-in; honors Obsidian's Templates folder setting). Supports `{{title}}` `{{date}}` `{{time}}` `{{date:YYYY-MM-DD}}` |
 | **WYSIWYG editing** | Toolbar + `/` menu for headings, colors, highlight, tables, callouts, code blocks, LaTeX math and `[[links]]` — no syntax to remember; switch to source mode any time |
 | **Tables** | Hover handles on rows/columns to insert, delete and align in place; drag column widths; images inside cells |
 | **Images** | Paste a screenshot and it is saved as an attachment; double-click to view the original (zoom, pan); **copy to DingTalk / Lark / Word with images intact** (inlined as base64) |

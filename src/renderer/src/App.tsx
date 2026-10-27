@@ -248,10 +248,18 @@ function VaultMenu({ config, setConfig, cfg, setCfg }: {
               setCfg(next)
             }
           })}
-          {item(`实验笔记文件夹：${cfg.noteFolder}`, async () => {
-            const v = await askText('从任务创建的实验笔记保存到', cfg.noteFolder)
+          {item(`任务笔记文件夹：${cfg.noteFolder}`, async () => {
+            const v = await askText('从任务创建的笔记保存到', cfg.noteFolder)
             if (v?.trim()) {
               const next = { ...cfg, noteFolder: v.trim().replace(/^\/+|\/+$/g, '') }
+              await saveSettings(next)
+              setCfg(next)
+            }
+          })}
+          {item(`模板文件夹：${cfg.templateFolder}`, async () => {
+            const v = await askText('笔记模板所在文件夹（其中每篇笔记就是一个模板）', cfg.templateFolder)
+            if (v?.trim()) {
+              const next = { ...cfg, templateFolder: v.trim().replace(/^\/+|\/+$/g, '') }
               await saveSettings(next)
               setCfg(next)
             }

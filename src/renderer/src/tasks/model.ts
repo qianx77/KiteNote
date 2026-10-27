@@ -158,9 +158,11 @@ export const weekdayName = (s: string): string => WD[parseDate(s).getDay()]
 export interface TaskSettings {
   taskFolder: string
   noteFolder: string
+  /** 自定义模板所在文件夹（与 Obsidian 核心插件「模板」兼容，默认读取 .obsidian/templates.json） */
+  templateFolder: string
 }
 
-export const DEFAULT_SETTINGS: TaskSettings = { taskFolder: '任务', noteFolder: '实验记录' }
+export const DEFAULT_SETTINGS: TaskSettings = { taskFolder: '任务', noteFolder: '实验记录', templateFolder: '模板' }
 
 export function scopePath(s: Scope, cfg: TaskSettings): string {
   return s.kind === 'day' ? `${cfg.taskFolder}/每日/${s.key}.md` : `${cfg.taskFolder}/每周/${s.key}.md`
@@ -179,16 +181,28 @@ export function safeFileName(s: string): string {
   return s.replace(/[\\/:*?"<>|#^[\]]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || '未命名'
 }
 
-export function noteTemplate(title: string, s: Scope, cfg: TaskSettings): string {
-  const date = s.kind === 'day' ? s.key : weekMonday(s.key)
-  const taskLink = scopePath(s, cfg).replace(/\.md$/, '')
-  return `---
-tags: [实验]
-date: ${date}
-task: "[[${taskLink}]]"
----
-# ${title}
+// ---------- 笔记模板 ----------
 
+export interface NoteTemplate {
+  name: string
+  /** 模板原文，支持 {{title}} {{date}} {{time}} {{task}} 与 {{date:YYYY-MM-DD}} 等 Obsidian 写法 */
+  body: string
+  /** 来自库内模板文件夹时为文件路径 */
+  path?: string
+}
+
+const fm = (tag: string): string => `---
+tags: [${tag}]
+date: {{date}}
+task: "[[{{task}}]]"
+---
+# {{title}}
+`
+
+export const BUILTIN_TEMPLATES: NoteTemplate[] = [
+  {
+    name: '实验记录',
+    body: `${fm('实验')}
 ## 目标
 
 
@@ -204,4 +218,114 @@ task: "[[${taskLink}]]"
 ## 结论与下一步
 
 `
+  },
+  {
+    name: '问题排查',
+    body: `${fm('排查')}
+## 现象
+
+- 环境：
+- 复现步骤：
+- 影响范围：
+
+## 排查过程
+
+
+## 根因
+
+
+## 解决方案
+
+
+## 后续预防
+
+`
+  },
+  {
+    name: '会议纪要',
+    body: `${fm('会议')}
+- 时间：{{date}} {{time}}
+- 参会人：
+
+## 议题
+
+
+## 讨论要点
+
+
+## 结论
+
+
+## 待办
+
+- [ ] 
+`
+  },
+  {
+    name: '通用工作记录',
+    body: `${fm('工作')}
+## 背景 / 目标
+
+
+## 做了什么
+
+
+## 结果
+
+
+## 下一步
+
+`
+  }
+]
+
+/** 同名的库内模板覆盖内置模板；内置模板在前，其余按名称排序 */
+export function mergeTemplates(vault: NoteTemplate[]): NoteTemplate[] {
+  const byName = new Map(vault.map((t) => [t.name, t]))
+  const merged = BUILTIN_TEMPLATES.map((b) => byName.get(b.name) ?? b)
+  const extra = vault.filter((t) => !BUILTIN_TEMPLATES.some((b) => b.name === t.name)).sort((a, b) => a.name.localeCompare(b.name, 'zh'))
+  return [...merged, ...extra]
+}
+
+
+function formatDate(d: Date, fmt: string): string {
+  return fmt.replace(/YYYY|MM|DD|HH|mm|ss/g, (k) =>
+    ({ YYYY: String(d.getFullYear()), MM: pad(d.getMonth() + 1), DD: pad(d.getDate()), HH: pad(d.getHours()), mm: pad(d.getMinutes()), ss: pad(d.getSeconds()) })[k]!
+  )
+}
+
+export interface TemplateVars {
+  title: string
+  /** 任务所在日期（周任务为周一），YYYY-MM-DD */
+  date: string
+  /** 任务清单的链接目标 */
+  task: string
+  now?: Date
+}
+
+/** 渲染模板；模板没有写 task 属性时自动补上，保证笔记顶部能跳回任务 */
+export function renderTemplate(body: string, v: TemplateVars): string {
+  const now = v.now ?? new Date()
+  const [y, m, d] = v.date.split('-').map(Number)
+  const day = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds())
+  let out = body.replace(/\{\{\s*(title|date|time|task)(?::([^}]*))?\s*\}\}/g, (_all, key: string, fmt?: string) => {
+    if (key === 'title') return v.title
+    if (key === 'task') return v.task
+    if (key === 'date') return fmt ? formatDate(day, fmt.trim()) : v.date
+    return formatDate(now, fmt?.trim() || 'HH:mm')
+  })
+  const taskLine = `task: "[[${v.task}]]"`
+  const head = out.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n|$)/)
+  if (!head) out = `---\n${taskLine}\n---\n${out}`
+  else if (!/^task\s*:/m.test(head[1])) out = out.replace(/^---\r?\n/, `---\n${taskLine}\n`)
+  return out
+}
+
+export function taskTemplateVars(title: string, s: Scope, cfg: TaskSettings): TemplateVars {
+  return { title, date: s.kind === 'day' ? s.key : weekMonday(s.key), task: scopePath(s, cfg).replace(/\.md$/, '') }
+}
+
+/** 默认（实验记录）模板，保留给旧调用 */
+export function noteTemplate(title: string, s: Scope, cfg: TaskSettings): string {
+  return renderTemplate(BUILTIN_TEMPLATES[0].body, taskTemplateVars(title, s, cfg))
 }

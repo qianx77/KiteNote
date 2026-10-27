@@ -12,9 +12,10 @@ import {
   type Scope,
   type Task,
   type TaskFile,
+  type NoteTemplate,
   type TaskSettings
 } from './model'
-import { createNoteForTask, loadScope, moveTask, saveScope } from './store'
+import { createNoteForTask, exportBuiltinTemplates, lastTemplateName, loadScope, loadTemplates, moveTask, saveScope } from './store'
 import { askText, confirmBox, showMenu, toast } from '../ui'
 import { vaultIndex } from '../vaultIndex'
 
@@ -72,12 +73,36 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
     })
   }
 
-  const openOrCreateNote = async (t: Task): Promise<void> => {
+  /** 已关联则打开；否则在 (x, y) 弹出模板选择，按所选模板创建笔记 */
+  const openOrCreateNote = async (t: Task, x: number, y: number): Promise<void> => {
     if (t.link) return onOpenNote(t.link)
-    // 统一先放在「实验记录」文件夹，之后在文件树里拖到各项目归类（链接会自动更新）
-    const link = await createNoteForTask(t, scope, cfg)
-    await update(t.id, { link })
-    onOpenNote(link)
+    const templates = await loadTemplates(cfg)
+    const last = lastTemplateName()
+    const create = async (tpl: NoteTemplate): Promise<void> => {
+      // 统一先放在笔记文件夹，之后在文件树里拖到各项目归类（链接会自动更新）
+      const link = await createNoteForTask(t, scope, cfg, tpl)
+      await update(t.id, { link })
+      onOpenNote(link)
+    }
+    showMenu(x, y, [
+      ...templates.map((tpl) => ({
+        label: `${tpl.name === last ? '● ' : '　 '}${tpl.name}`,
+        action: () => void create(tpl)
+      })),
+      { separator: true, label: '' },
+      {
+        label: '编辑 / 新增模板…',
+        action: async () => {
+          onOpenNote(await exportBuiltinTemplates(cfg))
+          toast(`模板在「${cfg.templateFolder}」文件夹：改这里的笔记即改模板，新建笔记即新增模板。可用 {{title}} {{date}} {{time}}`, 6000)
+        }
+      }
+    ])
+  }
+  const noteMenuAt = (t: Task) => (e: React.MouseEvent): void => {
+    e.stopPropagation()
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    void openOrCreateNote(t, r.left, r.bottom + 4)
   }
 
   const move = async (t: Task, to: Scope): Promise<void> => {
@@ -109,7 +134,7 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
       } },
       { label: '移到本周清单', action: () => move(t, { kind: 'week', key: isoWeek(day) }) },
       { separator: true, label: '' },
-      { label: t.link ? '打开关联笔记' : '创建实验笔记', action: () => openOrCreateNote(t) },
+      { label: t.link ? '打开关联笔记' : '创建笔记（选择模板）…', action: () => openOrCreateNote(t, e.clientX, e.clientY) },
       { label: '关联已有笔记…', action: async () => {
         const notes = vaultIndex.files.filter((f) => f.path.endsWith('.md')).map((f) => f.path.slice(0, -3))
         const link = await askText('输入或选择笔记', t.link ?? '', { suggestions: notes })
@@ -148,7 +173,7 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
           </div>
         )}
       </div>
-      <button className="icon-btn" title={t.link ? '打开实验笔记' : '为该任务创建实验笔记'} onClick={(e) => { e.stopPropagation(); void openOrCreateNote(t) }}>
+      <button className="icon-btn" title={t.link ? '打开关联笔记' : '为该任务创建笔记（可选模板）'} onClick={noteMenuAt(t)}>
         {t.link ? '📝' : '＋📝'}
       </button>
       <button className={`icon-btn star${t.important ? ' on' : ''}`} title="重要" onClick={(e) => { e.stopPropagation(); void update(t.id, { important: !t.important }) }}>
@@ -186,7 +211,7 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
           key={sel.id}
           task={sel}
           onUpdate={(p) => update(sel.id, p)}
-          onOpenNote={() => openOrCreateNote(sel)}
+          onOpenNote={noteMenuAt(sel)}
           onDelete={() => remove(sel)}
           onClose={() => setSelected(null)}
         />
@@ -198,7 +223,7 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
 function TaskDetail(props: {
   task: Task
   onUpdate: (p: Partial<Task>) => void
-  onOpenNote: () => void
+  onOpenNote: (e: React.MouseEvent) => void
   onDelete: () => void
   onClose: () => void
 }) {
@@ -276,14 +301,14 @@ function TaskDetail(props: {
         />
       </div>
       <div className="detail-section">
-        <div className="detail-label">实验笔记</div>
+        <div className="detail-label">关联笔记</div>
         {task.link ? (
           <div className="detail-note">
             <a onClick={props.onOpenNote}>📝 {task.link}</a>
             <button className="btn small" onClick={() => props.onUpdate({ link: null })}>取消关联</button>
           </div>
         ) : (
-          <button className="btn primary" onClick={props.onOpenNote}>创建实验笔记（含目标/配置/结果模板）</button>
+          <button className="btn primary" onClick={props.onOpenNote}>创建笔记（选择模板）▾</button>
         )}
       </div>
       <div className="detail-section row">
