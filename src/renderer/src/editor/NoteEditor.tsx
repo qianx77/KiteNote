@@ -5,11 +5,11 @@ import type { Node as PMNode } from '@tiptap/pm/model'
 import { createExtensions, PARSE_OPTIONS } from './extensions'
 import { Toolbar } from './Toolbar'
 import { frontmatterField, joinFrontmatter, parseContext, splitFrontmatter } from './markdownIt'
-import { copyFragment, dataUrlToBlob, markdownFromHtml, saveFileAsNode } from './clipboard'
+import { copyFragment, dataUrlToBlob, isWholeTableSelected, markdownFromHtml, saveFileAsNode, selectionToCopy } from './clipboard'
 import { askText, showImageViewer, showMenu, toast } from '../ui'
 import { copyLinkText } from '../links'
 import { vaultIndex } from '../vaultIndex'
-import { CellSelection } from '@tiptap/pm/tables'
+import { CellSelection, isInTable } from '@tiptap/pm/tables'
 import { TableHover, tableMenuItems } from './TableTools'
 import { Outline } from './Outline'
 
@@ -330,9 +330,19 @@ function RichEditor({ path, body, frontmatterRef, onOpenLink, onChange, onBlur, 
         }
         return false
       },
+      // 选中整张表格后按 Delete / Backspace：删除表格（默认只会清空格子内容）
+      handleKeyDown: (view, event) => {
+        if ((event.key === 'Delete' || event.key === 'Backspace') && isWholeTableSelected(view.state)) {
+          event.preventDefault()
+          return editorRef.current!.commands.deleteTable()
+        }
+        return false
+      },
       handlePaste: (view, event) => {
         const dt = event.clipboardData
         if (!dt) return false
+        // 在表格里粘贴复制来的表格：交给表格插件按格子填入（同 Excel），而不是插入一张新表
+        if (isInTable(view.state) && /<table[\s>]/i.test(dt.getData('text/html'))) return false
         // 从本软件复制的内容：按原始 Markdown 还原（双链、公式、待办都保持可用）
         const md = view.state.selection.$from.parent.type.spec.code ? null : markdownFromHtml(dt.getData('text/html'))
         if (md !== null) {
@@ -364,15 +374,18 @@ function RichEditor({ path, body, frontmatterRef, onOpenLink, onChange, onBlur, 
           const sel = view.state.selection
           if (sel.empty || sel.$from.parent.type.spec.code) return false
           event.preventDefault()
-          void copyFragment(editorRef.current!, sel.content().content)
+          const c = selectionToCopy(view.state)
+          void copyFragment(editorRef.current!, c.fragment, c.markdown)
           return true
         },
         cut: (view, event) => {
           const sel = view.state.selection
           if (sel.empty || sel.$from.parent.type.spec.code) return false
           event.preventDefault()
-          void copyFragment(editorRef.current!, sel.content().content)
-          view.dispatch(view.state.tr.deleteSelection())
+          const c = selectionToCopy(view.state)
+          void copyFragment(editorRef.current!, c.fragment, c.markdown)
+          if (isWholeTableSelected(view.state)) editorRef.current!.commands.deleteTable()
+          else view.dispatch(view.state.tr.deleteSelection())
           return true
         },
         contextmenu: (view, event) => {

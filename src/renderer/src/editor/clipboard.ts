@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Editor } from '@tiptap/core'
-import { DOMSerializer, Fragment } from '@tiptap/pm/model'
+import { DOMSerializer, Fragment, type Node as PMNode } from '@tiptap/pm/model'
+import type { EditorState } from '@tiptap/pm/state'
+import { CellSelection } from '@tiptap/pm/tables'
 import { vaultIndex, vaultUrl } from '../vaultIndex'
 
 /**
@@ -83,13 +85,52 @@ export function markdownFromHtml(html: string): string | null {
   }
 }
 
-export async function copyFragment(editor: Editor, fragment: Fragment): Promise<void> {
+/**
+ * 选区要复制的内容。表格选区（CellSelection）原样只有若干「行」，不处理会丢掉表格结构：
+ * 只选中一个格子时复制格内内容；跨格（多行/多列）时补上外层表格一起复制。
+ * markdown 用的副本把首行转为表头，保证存成标准 Markdown 表格。
+ */
+export function selectionToCopy(state: EditorState): { fragment: Fragment; markdown: Fragment } {
+  const sel = state.selection
+  if (!(sel instanceof CellSelection)) {
+    // 在同一个格子里拖到格子边缘时，选区会带上外层表格结构：拆掉只剩一格的表格 / 行 / 格外壳
+    let fragment = sel.content().content
+    const shell = new Set(['table', 'tableRow', 'tableCell', 'tableHeader'])
+    while (fragment.childCount === 1 && shell.has(fragment.firstChild!.type.name) && fragment.firstChild!.childCount <= 1) {
+      fragment = fragment.firstChild!.content
+    }
+    return { fragment, markdown: fragment }
+  }
+  const cells: PMNode[] = []
+  sel.forEachCell((c) => void cells.push(c))
+  if (cells.length === 1) return { fragment: cells[0].content, markdown: cells[0].content }
+  const source = sel.$anchorCell.node(-1)
+  const content = sel.content().content
+  const table = content.firstChild?.type.name === 'table' ? content.firstChild : source.type.create(source.attrs, content)
+  const header = state.schema.nodes.tableHeader
+  const rows: PMNode[] = []
+  table.forEach((row, _o, i) => {
+    if (i > 0 || !header) return void rows.push(row)
+    const hs: PMNode[] = []
+    row.forEach((c) => void hs.push(c.type === header ? c : header.create(c.attrs, c.content, c.marks)))
+    rows.push(row.copy(Fragment.from(hs)))
+  })
+  return { fragment: Fragment.from(table), markdown: Fragment.from(table.copy(Fragment.from(rows))) }
+}
+
+/** 是否选中了整张表格（全部行和列） */
+export function isWholeTableSelected(state: EditorState): boolean {
+  const sel = state.selection
+  return sel instanceof CellSelection && sel.isRowSelection() && sel.isColSelection()
+}
+
+export async function copyFragment(editor: Editor, fragment: Fragment, markdown: Fragment = fragment): Promise<void> {
   const html = fragmentToHtml(editor, fragment)
   let text = ''
   try {
-    text = editor.storage.markdown.serializer.serialize(fragment)
+    text = editor.storage.markdown.serializer.serialize(markdown)
   } catch {
-    text = fragment.textBetween(0, fragment.size, '\n')
+    text = markdown.textBetween(0, markdown.size, '\n')
   }
   await window.api.copyRich({ html: text ? withMarkdown(html, text) : html, text })
 }

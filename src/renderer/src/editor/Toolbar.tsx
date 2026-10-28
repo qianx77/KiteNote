@@ -1,5 +1,5 @@
 import type { Editor } from '@tiptap/core'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { askText } from '../ui'
 import { insertCallout, insertMath, insertWikiLink } from './slash'
 
@@ -26,8 +26,25 @@ function Btn(props: { title: string; active?: boolean; disabled?: boolean; onCli
 
 function Palette(props: { title: string; label: React.ReactNode; colors: string[]; onPick: (c: string | null) => void }) {
   const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  // 点击外部或按 Esc 关闭（不用 mouseleave：按钮与色板之间有缝，鼠标移慢了色板会先关掉）
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent): void => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown, true)
+    document.addEventListener('keydown', onKey, true)
+    return () => {
+      document.removeEventListener('mousedown', onDown, true)
+      document.removeEventListener('keydown', onKey, true)
+    }
+  }, [open])
   return (
-    <span className="tb-drop" onMouseLeave={() => setOpen(false)}>
+    <span className="tb-drop" ref={ref}>
       <Btn title={props.title} onClick={() => setOpen(!open)}>
         {props.label}
       </Btn>
