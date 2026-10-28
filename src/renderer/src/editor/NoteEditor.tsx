@@ -13,7 +13,7 @@ import { CellSelection, isInTable } from '@tiptap/pm/tables'
 import { TableHover, tableMenuItems } from './TableTools'
 import { Outline } from './Outline'
 
-const OUTLINE_KEY = 'labnote.outline'
+const OUTLINE_KEY = 'kitenote.outline'
 const readOutlinePref = (): boolean => {
   try {
     return localStorage.getItem(OUTLINE_KEY) !== '0'
@@ -91,7 +91,13 @@ export function NoteEditor({ path, onOpenLink }: Props) {
     }
     setStatus('saving')
     try {
-      await window.api.writeFile(path, text)
+      // 以打开时读到的版本为准：期间被同步盘等改过就不覆盖，本机改动另存为冲突副本
+      const copy = await window.api.writeFileChecked(path, text, lastSaved.current)
+      if (copy) {
+        await load()
+        toast(`这篇笔记已在其他设备或外部被修改，未覆盖。你的改动已另存为「${copy}」，请对照合并`, 10000)
+        return
+      }
       lastSaved.current = text
       setStatus('saved')
     } catch (e) {
@@ -453,8 +459,8 @@ function RichEditor({ path, body, frontmatterRef, onOpenLink, onChange, onBlur, 
 
   useEffect(() => {
     const pick = (): void => fileInput.current?.click()
-    window.addEventListener('labnote:pick-image', pick)
-    return () => window.removeEventListener('labnote:pick-image', pick)
+    window.addEventListener('kitenote:pick-image', pick)
+    return () => window.removeEventListener('kitenote:pick-image', pick)
   }, [])
 
   if (!editor) return null

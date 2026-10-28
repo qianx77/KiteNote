@@ -146,9 +146,9 @@ function mathBlock(state: StateBlock, startLine: number, endLine: number, silent
 }
 
 export function obsidianMarkdownIt(md: MarkdownIt): void {
-  const anyMd = md as MarkdownIt & { __labnote?: boolean }
-  if (anyMd.__labnote) return
-  anyMd.__labnote = true
+  const anyMd = md as MarkdownIt & { __kitenote?: boolean }
+  if (anyMd.__kitenote) return
+  anyMd.__kitenote = true
 
   // 不解析引用式链接定义：`[^1]: 脚注`、`[id]: url` 原样作为文本保留，避免内容消失
   md.block.ruler.disable('reference')

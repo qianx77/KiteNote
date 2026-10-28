@@ -57,7 +57,7 @@ export const SLASH_ITEMS: SlashItem[] = [
   { title: '双链 [[ ]]', hint: '[[笔记]]', keys: 'link wiki sl', run: (e) => void insertWikiLink(e) },
   { title: '行内公式', hint: '$x$', keys: 'math gs', run: (e) => void insertMath(e, false) },
   { title: '块级公式', hint: '$$', keys: 'math gs', run: (e) => void insertMath(e, true) },
-  { title: '图片', hint: '从文件插入', keys: 'image tp', run: () => window.dispatchEvent(new CustomEvent('labnote:pick-image')) }
+  { title: '图片', hint: '从文件插入', keys: 'image tp', run: () => window.dispatchEvent(new CustomEvent('kitenote:pick-image')) }
 ]
 
 function createMenu() {

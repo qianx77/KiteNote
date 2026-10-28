@@ -2,7 +2,7 @@ import { _electron as electron } from 'playwright-core'
 import { promises as fs } from 'fs'
 import path from 'path'
 const PROJECT = process.cwd()
-const S = process.argv[2] ?? (await import('os')).tmpdir() + '/labnote-demo'
+const S = process.argv[2] ?? (await import('os')).tmpdir() + '/kitenote-demo'
 const V = path.join(S, 'demo-vault')
 const UD = path.join(S, 'ud-demo')
 const OUT = path.join(PROJECT, 'docs/images')
@@ -74,9 +74,9 @@ T=4 略优于 T=8，下一步试 **T=2** 和 α=0.7。#todo
 await w('项目/ViT 蒸馏/ViT-B 基线.md', `# ViT-B 基线\n\ntop-1 83.1\n`)
 await w('项目/检测模型/推理耗时分析.md', `# 推理耗时分析\n\n## 前处理\n\n## 模型\n\n## 后处理\n`)
 await w('实验记录/2026-10-24 数据增强消融.md', `# 数据增强消融\n`)
-await w('欢迎.md', `# 欢迎使用 LabNote\n`)
+await w('欢迎.md', `# 欢迎使用 KiteNote\n`)
 
-const app = await electron.launch({ executablePath: path.join(PROJECT, 'node_modules/electron/dist/electron.exe'), args: [PROJECT], env: { ...process.env, LABNOTE_USER_DATA: UD } })
+const app = await electron.launch({ executablePath: path.join(PROJECT, 'node_modules/electron/dist/electron.exe'), args: [PROJECT], env: { ...process.env, KITENOTE_USER_DATA: UD } })
 const win = await app.firstWindow()
 const errors = []
 win.on('pageerror', (e) => errors.push(String(e)))

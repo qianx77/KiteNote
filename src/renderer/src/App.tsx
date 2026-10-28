@@ -301,7 +301,7 @@ function Welcome({ config, setConfig }: { config: AppConfig; setConfig: (c: AppC
   return (
     <div className="welcome">
       <div className="welcome-card">
-        <h1>◆ LabNote</h1>
+        <h1>◆ KiteNote</h1>
         <p className="sub">实验记录 + 每日/每周任务。所有数据都是普通 Markdown 文件，与 Obsidian 完全兼容。</p>
         <button className="btn primary big" onClick={() => window.api.chooseVault().then(setConfig)}>
           打开或新建库文件夹

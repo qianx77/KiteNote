@@ -33,6 +33,8 @@ export interface TaskFile {
   preamble: string[]
   tasks: Task[]
   eol: string
+  /** 读取时磁盘上的原文（null/缺省 = 文件原本不存在），保存时用来发现外部修改 */
+  raw?: string | null
 }
 
 export type Scope = { kind: 'day'; key: string } | { kind: 'week'; key: string }
@@ -171,7 +173,7 @@ export function scopePath(s: Scope, cfg: TaskSettings): string {
 export function emptyTaskFile(s: Scope): TaskFile {
   const title = s.kind === 'day' ? `# ${s.key} ${weekdayName(s.key)}` : `# ${s.key} 周计划（${weekMonday(s.key)} 起）`
   return {
-    preamble: ['---', `labnote: ${s.kind === 'day' ? 'daily' : 'weekly'}`, `${s.kind === 'day' ? 'date' : 'week'}: ${s.key}`, '---', title],
+    preamble: ['---', `kitenote: ${s.kind === 'day' ? 'daily' : 'weekly'}`, `${s.kind === 'day' ? 'date' : 'week'}: ${s.key}`, '---', title],
     tasks: [],
     eol: '\n'
   }

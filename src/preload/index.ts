@@ -9,6 +9,7 @@ const api: VaultApi = {
   listFiles: () => ipcRenderer.invoke('fs:list'),
   readFile: (rel) => ipcRenderer.invoke('fs:read', rel),
   writeFile: (rel, content) => ipcRenderer.invoke('fs:write', rel, content),
+  writeFileChecked: (rel, content, expected) => ipcRenderer.invoke('fs:write-checked', rel, content, expected),
   exists: (rel) => ipcRenderer.invoke('fs:exists', rel),
   createFolder: (rel) => ipcRenderer.invoke('fs:mkdir', rel),
   rename: (a, b) => ipcRenderer.invoke('fs:rename', a, b),

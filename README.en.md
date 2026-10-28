@@ -1,4 +1,4 @@
-# LabNote
+# KiteNote
 
 **Connect your daily tasks to your work notes: To Do–style daily/weekly tasks, where every task can spawn a WYSIWYG, Obsidian-compatible Markdown note.**
 
@@ -6,7 +6,7 @@ Good for ML experiment logs, dev / debugging journals, project tracking, meeting
 
 [中文](README.md) · [Download](../../releases) · Everything is plain local `.md` files — open the same folder in Obsidian any time
 
-![LabNote note view](docs/images/note.png)
+![KiteNote note view](docs/images/note.png)
 
 ## Why
 
@@ -16,7 +16,7 @@ I work in ML and kept switching between two apps: a to-do list for *what to do t
 - Markdown syntax gets in the way — tables especially.
 - Images and tables are lost when copying notes into DingTalk / Lark / Word for reports.
 
-LabNote puts all three in one window **without inventing a new format**: tasks and notes are ordinary Markdown, so your existing Obsidian vault and sync setup keep working.
+KiteNote puts all three in one window **without inventing a new format**: tasks and notes are ordinary Markdown, so your existing Obsidian vault and sync setup keep working.
 
 ## Features
 
@@ -50,10 +50,10 @@ vault/
 ├─ 任务/每周/2026-W44.md      ⏫ = important, ✅ date = done (Obsidian Tasks compatible)
 ├─ projects/…                 ordinary Markdown notes
 ├─ attachments/               images, following .obsidian/app.json
-└─ .labnote/settings.json     folder settings
+└─ .kitenote/settings.json     folder settings
 ```
 
-Stop using LabNote and there is nothing to migrate: open the same folder in Obsidian or any editor.
+Stop using KiteNote and there is nothing to migrate: open the same folder in Obsidian or any editor.
 
 ## About "lossless"
 

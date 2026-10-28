@@ -12,7 +12,7 @@
 2. Markdown 表格、公式要记语法；
 3. 笔记复制到钉钉文档，图片全丢。
 
-所以写了 LabNote：
+所以写了 KiteNote：
 
 - To Do 式的「我的一天 / 本周计划」，任务可以有步骤、备注、「标记为不做」；
 - 任务上点一下生成一篇工作记录，双链关联；
@@ -31,7 +31,7 @@ Electron + TipTap，MIT 开源，目前只有 Windows 包。
 
 # 即刻 / 微博 / 朋友圈
 
-做了个小工具 LabNote：To Do 式的每日任务 + 每个任务一篇工作记录，所见即所得，存的是纯 Markdown，能直接用 Obsidian 打开。
+做了个小工具 KiteNote：To Do 式的每日任务 + 每个任务一篇工作记录，所见即所得，存的是纯 Markdown，能直接用 Obsidian 打开。
 
 最爽的一点：笔记里的图和表复制到钉钉文档不会丢。
 
@@ -51,6 +51,6 @@ Electron + TipTap，MIT 开源，目前只有 Windows 包。
 📌 截图直接粘贴，复制到钉钉图片不丢
 📌 数据存在自己电脑里，网盘同步，兼容 Obsidian
 
-开源免费，GitHub 搜 LabNote
+开源免费，GitHub 搜 KiteNote
 
 #效率工具 #工作记录 #Obsidian #打工人 #周报

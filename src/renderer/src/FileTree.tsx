@@ -153,9 +153,9 @@ export function FileTree({ files, active, onOpen, onChanged }: Props) {
             }}
             onContextMenu={(e) => menu(e, n)}
             draggable
-            onDragStart={(e) => e.dataTransfer.setData('labnote/path', n.path)}
+            onDragStart={(e) => e.dataTransfer.setData('kitenote/path', n.path)}
             onDragOver={(e) => {
-              if (e.dataTransfer.types.includes('labnote/path')) {
+              if (e.dataTransfer.types.includes('kitenote/path')) {
                 e.preventDefault()
                 setDropTarget(n.path)
               }
@@ -164,7 +164,7 @@ export function FileTree({ files, active, onOpen, onChanged }: Props) {
             onDrop={(e) => {
               e.preventDefault()
               setDropTarget(null)
-              const from = e.dataTransfer.getData('labnote/path')
+              const from = e.dataTransfer.getData('kitenote/path')
               if (from) void move(from, n.path)
             }}
           >
@@ -184,7 +184,7 @@ export function FileTree({ files, active, onOpen, onChanged }: Props) {
         onMouseDown={noSelect}
         onClick={() => onOpen(n.path)}
         draggable
-        onDragStart={(e) => e.dataTransfer.setData('labnote/path', n.path)}
+        onDragStart={(e) => e.dataTransfer.setData('kitenote/path', n.path)}
         onContextMenu={(e) => menu(e, n)}
         title={n.path}
       >
@@ -206,8 +206,8 @@ export function FileTree({ files, active, onOpen, onChanged }: Props) {
       <div
         className={`tree-body${dropTarget === "" ? " drop" : ""}`}
         onContextMenu={(e) => menu(e, tree)}
-        onDragOver={(e) => { if (e.target === e.currentTarget && e.dataTransfer.types.includes("labnote/path")) { e.preventDefault(); setDropTarget("") } }}
-        onDrop={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); setDropTarget(null); const from = e.dataTransfer.getData("labnote/path"); if (from) void move(from, "") }}
+        onDragOver={(e) => { if (e.target === e.currentTarget && e.dataTransfer.types.includes("kitenote/path")) { e.preventDefault(); setDropTarget("") } }}
+        onDrop={(e) => { if (e.target !== e.currentTarget) return; e.preventDefault(); setDropTarget(null); const from = e.dataTransfer.getData("kitenote/path"); if (from) void move(from, "") }}
       >
         {q
           ? flat.map((f) => (
@@ -215,7 +215,7 @@ export function FileTree({ files, active, onOpen, onChanged }: Props) {
                 onClick={() => onOpen(f.path)}
                 onContextMenu={(e) => menu(e, { name: basename(f.path), path: f.path, isDir: false, children: [] })}
                 draggable
-                onDragStart={(e) => e.dataTransfer.setData('labnote/path', f.path)}
+                onDragStart={(e) => e.dataTransfer.setData('kitenote/path', f.path)}
                 title={f.path}
               >
                 {f.path.replace(/\.md$/, '')}

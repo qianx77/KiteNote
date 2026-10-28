@@ -1,4 +1,4 @@
-# LabNote
+# KiteNote
 
 **把每天的任务和工作记录连起来：To Do 式的日/周任务，每个任务一键生成一篇所见即所得、兼容 Obsidian 的 Markdown 记录。**
 
@@ -6,7 +6,7 @@
 
 [English](README.en.md) · [下载](../../releases) · 数据全是本地 `.md` 文件，可直接用 Obsidian 打开
 
-![LabNote 笔记页](docs/images/note.png)
+![KiteNote 笔记页](docs/images/note.png)
 
 ## 为什么做这个
 
@@ -16,7 +16,7 @@
 - Obsidian 要记 Markdown 语法，表格尤其难写；
 - 笔记里的图和表复制到钉钉文档就丢了，写周报/汇报要重新贴一遍。
 
-LabNote 把这三件事放进一个窗口，并且**不发明新格式**——任务和笔记都是普通 Markdown，继续兼容你的 Obsidian 库和同步方式。
+KiteNote 把这三件事放进一个窗口，并且**不发明新格式**——任务和笔记都是普通 Markdown，继续兼容你的 Obsidian 库和同步方式。
 
 ## 功能
 
@@ -48,10 +48,10 @@ LabNote 把这三件事放进一个窗口，并且**不发明新格式**——�
 ├─ 任务/每周/2026-W44.md      ⏫ 重要，✅ 日期 = 完成日（兼容 Obsidian Tasks 插件）
 ├─ 项目/… 实验记录/…          普通 Markdown 笔记
 ├─ 附件/                      图片，遵循 .obsidian/app.json 的附件目录
-└─ .labnote/settings.json     任务/笔记文件夹设置
+└─ .kitenote/settings.json     任务/笔记文件夹设置
 ```
 
-不用 LabNote 了？什么都不用迁移，用 Obsidian 或任何编辑器打开同一个文件夹即可。
+不用 KiteNote 了？什么都不用迁移，用 Obsidian 或任何编辑器打开同一个文件夹即可。
 
 ## 关于「无损」
 

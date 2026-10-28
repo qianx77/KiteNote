@@ -1,12 +1,13 @@
 import { app, BrowserWindow, clipboard, dialog, ipcMain, nativeImage, net, protocol, shell } from 'electron'
 import { promises as fs } from 'fs'
+import os from 'os'
 import path from 'path'
 import { pathToFileURL } from 'url'
 import { importVault, Vault } from './vault'
 import type { AppConfig } from '../shared/types'
 
 // 便于测试/便携使用：指定独立的配置目录
-if (process.env.LABNOTE_USER_DATA) app.setPath('userData', process.env.LABNOTE_USER_DATA)
+if (process.env.KITENOTE_USER_DATA) app.setPath('userData', process.env.KITENOTE_USER_DATA)
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'vault', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }
@@ -19,10 +20,16 @@ let vault: Vault | null = null
 let win: BrowserWindow | null = null
 
 async function loadConfig(): Promise<void> {
-  try {
-    config = { ...config, ...JSON.parse(await fs.readFile(configFile(), 'utf8')) }
-  } catch {
-    /* 首次启动 */
+  // 改名前（LabNote）的配置目录：新配置不存在时沿用，升级后不必重新选库
+  const legacy = path.join(app.getPath('appData'), 'LabNote', 'config.json')
+  const files = process.env.KITENOTE_USER_DATA ? [configFile()] : [configFile(), legacy]
+  for (const file of files) {
+    try {
+      config = { ...config, ...JSON.parse(await fs.readFile(file, 'utf8')) }
+      return
+    } catch {
+      /* 首次启动 */
+    }
   }
 }
 
@@ -116,6 +123,9 @@ function registerIpc(): void {
   ipcMain.handle('fs:list', () => requireVault().list())
   ipcMain.handle('fs:read', (_e, rel: string) => requireVault().read(rel))
   ipcMain.handle('fs:write', (_e, rel: string, content: string) => requireVault().write(rel, content))
+  ipcMain.handle('fs:write-checked', (_e, rel: string, content: string, expected: string | null) =>
+    requireVault().writeChecked(rel, content, expected, os.hostname())
+  )
   ipcMain.handle('fs:exists', (_e, rel: string) => requireVault().exists(rel))
   ipcMain.handle('fs:mkdir', (_e, rel: string) => requireVault().mkdir(rel))
   ipcMain.handle('fs:rename', (_e, a: string, b: string) => requireVault().rename(a, b))
@@ -140,7 +150,7 @@ function createWindow(): void {
     height: 900,
     minWidth: 900,
     minHeight: 600,
-    title: 'LabNote',
+    title: 'KiteNote',
     autoHideMenuBar: true,
     webPreferences: { preload: path.join(__dirname, '../preload/index.js'), sandbox: false, contextIsolation: true }
   })

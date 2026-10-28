@@ -56,14 +56,50 @@ export class Vault {
     return fs.readFile(this.abs(rel))
   }
 
-  async write(rel: string, content: string | Uint8Array): Promise<void> {
+  /** notify：不把这次写入当作「自己写的」，让监听照常通知界面（如冲突副本需要出现在文件树） */
+  async write(rel: string, content: string | Uint8Array, notify = false): Promise<void> {
     const full = this.abs(rel)
     await fs.mkdir(path.dirname(full), { recursive: true })
-    this.recentWrites.set(toPosix(rel), Date.now())
+    if (!notify) this.recentWrites.set(toPosix(rel), Date.now())
     // 先写临时文件再改名，避免同步盘读到半个文件
     const tmp = `${full}.${process.pid}.tmp`
     await fs.writeFile(tmp, content)
     await fs.rename(tmp, full)
+  }
+
+  /**
+   * 两台电脑通过同步盘共用一个库时，本机打开后文件可能已被另一台改过。
+   * 磁盘内容仍是 expected（打开时读到的版本，null 表示原本不存在）才写入；
+   * 否则原文件保持外部版本不动，本机内容另存为「xxx (冲突副本 设备 时间).md」，返回副本路径。
+   * 外部删除了文件（读不到）时照常写回，避免正在编辑的内容丢失。
+   */
+  async writeChecked(rel: string, content: string, expected: string | null, device = ''): Promise<string | null> {
+    let current: string | null
+    try {
+      current = await this.read(rel)
+    } catch {
+      current = null
+    }
+    if (current === content) return null
+    if (current === null || current === expected) {
+      await this.write(rel, content)
+      return null
+    }
+    const copy = await this.conflictPath(rel, device)
+    await this.write(copy, content, true)
+    return copy
+  }
+
+  async conflictPath(rel: string, device = '', now = new Date()): Promise<string> {
+    const ext = path.posix.extname(rel)
+    const base = rel.slice(0, rel.length - ext.length)
+    const p2 = (n: number): string => String(n).padStart(2, '0')
+    const stamp = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}${p2(now.getMinutes())}${p2(now.getSeconds())}`
+    const dev = device.replace(/[\\/:*?"<>|[\]#^]/g, '').trim()
+    const name = `${base} (冲突副本${dev ? ' ' + dev : ''} ${stamp})`
+    let out = `${name}${ext}`
+    for (let i = 2; await this.exists(out); i++) out = `${name} ${i}${ext}`
+    return out
   }
 
   async exists(rel: string): Promise<boolean> {

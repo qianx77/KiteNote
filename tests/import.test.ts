@@ -18,7 +18,7 @@ async function makeObsidianVault(root: string): Promise<void> {
 
 describe('Obsidian 导入', () => {
   it('逐字节复制并校验，保留目录结构和隐藏配置', async () => {
-    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'labnote-'))
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'kitenote-'))
     const src = path.join(tmp, 'src')
     const dst = path.join(tmp, 'dst')
     await makeObsidianVault(src)

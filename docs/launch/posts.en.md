@@ -3,7 +3,7 @@
 # X / Twitter thread
 
 **1/**
-I built LabNote: a desktop app that connects your daily to-do list to your work notes.
+I built KiteNote: a desktop app that connects your daily to-do list to your work notes.
 
 To Do–style tasks → one click → a WYSIWYG Markdown note linked to the task.
 Plain .md files, works with your existing Obsidian vault. Open source.
@@ -43,11 +43,11 @@ Feedback and issues welcome 🙏
 
 # Show HN
 
-**Title:** Show HN: LabNote – daily tasks linked to WYSIWYG Markdown notes, Obsidian-compatible
+**Title:** Show HN: KiteNote – daily tasks linked to WYSIWYG Markdown notes, Obsidian-compatible
 
 **Text:**
 
-I'm an ML engineer. My to-dos lived in Microsoft To Do and my experiment logs in Obsidian, so weekly reviews meant cross-referencing two apps by hand. LabNote merges the two:
+I'm an ML engineer. My to-dos lived in Microsoft To Do and my experiment logs in Obsidian, so weekly reviews meant cross-referencing two apps by hand. KiteNote merges the two:
 
 - To Do–style "My Day" and "This Week" views; tasks can have steps, notes and a "won't do" state with a reason.
 - One click turns a task into a templated note (goal / method / log / results / conclusion), linked both ways.

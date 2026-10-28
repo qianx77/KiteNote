@@ -5,7 +5,7 @@ describe('任务文件', () => {
   it('解析与序列化往返不丢内容', () => {
     const src = [
       '---',
-      'labnote: daily',
+      'kitenote: daily',
       'date: 2026-10-26',
       '---',
       '# 2026-10-26 周一',

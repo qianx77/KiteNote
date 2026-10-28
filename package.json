@@ -1,6 +1,6 @@
 {
-  "name": "labnote",
-  "productName": "LabNote",
+  "name": "kitenote",
+  "productName": "KiteNote",
   "version": "0.1.0",
   "description": "实验记录 + 每日/每周任务管理：To Do 式清单 + Obsidian 兼容的所见即所得 Markdown 笔记",
   "main": "out/main/index.js",
@@ -58,8 +58,8 @@
     "vitest": "2.1.8"
   },
   "build": {
-    "appId": "com.labnote.app",
-    "productName": "LabNote",
+    "appId": "com.kitenote.app",
+    "productName": "KiteNote",
     "electronDist": "node_modules/electron/dist",
     "directories": {
       "output": "release"

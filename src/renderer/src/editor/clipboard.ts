@@ -65,14 +65,15 @@ export function fragmentToHtml(editor: Editor, fragment: Fragment): string {
 
 // 复制时在 HTML 里夹带原始 Markdown（HTML 注释，钉钉等外部应用会忽略），
 // 粘贴回本软件时据此还原 [[双链]]、公式、待办等，避免变成纯文字而失效。
-const MARK_RE = /<!--labnote-md:([A-Za-z0-9+/=]+)-->/
+// 同时认旧名 labnote-md，兼容改名前复制的内容。
+const MARK_RE = /<!--(?:kitenote|labnote)-md:([A-Za-z0-9+/=]+)-->/
 
 export function withMarkdown(html: string, md: string): string {
   const bytes = new TextEncoder().encode(md)
   let bin = ''
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
   const b64 = btoa(bin)
-  return `${html}<!--labnote-md:${b64}-->`
+  return `${html}<!--kitenote-md:${b64}-->`
 }
 
 export function markdownFromHtml(html: string): string | null {

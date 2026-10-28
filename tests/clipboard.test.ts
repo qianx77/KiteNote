@@ -11,13 +11,18 @@ describe('复制时夹带 Markdown', () => {
   it('中文与特殊字符往返', () => {
     const md = '见 [[实验/exp-001|基线]]，公式 $\\alpha$\n- [ ] 待办'
     const html = withMarkdown('<p>见 基线</p>', md)
-    expect(html.startsWith('<p>见 基线</p><!--labnote-md:')).toBe(true)
+    expect(html.startsWith('<p>见 基线</p><!--kitenote-md:')).toBe(true)
     expect(markdownFromHtml(`<html><body>${html}</body></html>`)).toBe(md)
   })
 
   it('长文本不溢出', () => {
     const md = '实验记录'.repeat(50000)
     expect(markdownFromHtml(withMarkdown('', md))).toBe(md)
+  })
+
+  it('兼容改名前（LabNote）复制的内容', () => {
+    const b64 = withMarkdown('', '- [ ] 旧版待办').split('kitenote-md:')[1]
+    expect(markdownFromHtml(`<p>x</p><!--labnote-md:${b64}`)).toBe('- [ ] 旧版待办')
   })
 
   it('外部 HTML 无标记', () => {

@@ -35,6 +35,11 @@ export interface VaultApi {
   listFiles(): Promise<FileEntry[]>
   readFile(rel: string): Promise<string>
   writeFile(rel: string, content: string): Promise<void>
+  /**
+   * 仅当磁盘内容仍是 expected（null 表示原本不存在）时才写入；
+   * 否则说明已被外部（同步盘 / Obsidian）改过：原文件不动，content 另存为冲突副本，返回副本路径
+   */
+  writeFileChecked(rel: string, content: string, expected: string | null): Promise<string | null>
   exists(rel: string): Promise<boolean>
   createFolder(rel: string): Promise<void>
   rename(from: string, to: string): Promise<void>

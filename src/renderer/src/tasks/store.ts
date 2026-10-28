@@ -15,15 +15,21 @@ import {
   type TaskFile,
   type TaskSettings
 } from './model'
+import { toast } from '../ui'
 
-const SETTINGS_PATH = '.labnote/settings.json'
+const SETTINGS_PATH = '.kitenote/settings.json'
+/** 改名前（LabNote）的设置位置，只读不写 */
+const LEGACY_SETTINGS_PATH = '.labnote/settings.json'
 
 export async function loadSettings(): Promise<TaskSettings> {
   let saved: Partial<TaskSettings> = {}
-  try {
-    saved = JSON.parse(await window.api.readFile(SETTINGS_PATH))
-  } catch {
-    /* 尚未保存过设置 */
+  for (const p of [SETTINGS_PATH, LEGACY_SETTINGS_PATH]) {
+    try {
+      saved = JSON.parse(await window.api.readFile(p))
+      break
+    } catch {
+      /* 尚未保存过设置 */
+    }
   }
   const s = { ...DEFAULT_SETTINGS, ...saved }
   // 没单独设置模板文件夹时，沿用 Obsidian「模板」核心插件的文件夹
@@ -44,18 +50,28 @@ export async function saveSettings(s: TaskSettings): Promise<void> {
 
 export async function loadScope(scope: Scope, cfg: TaskSettings): Promise<TaskFile> {
   const p = scopePath(scope, cfg)
+  let raw: string
   try {
-    return parseTaskFile(await window.api.readFile(p))
+    raw = await window.api.readFile(p)
   } catch {
     return emptyTaskFile(scope)
   }
+  return { ...parseTaskFile(raw), raw }
 }
 
-export async function saveScope(scope: Scope, cfg: TaskSettings, file: TaskFile): Promise<void> {
+/** 保存清单；返回 false 表示清单已被外部修改，本机版本另存为冲突副本（已提示） */
+export async function saveScope(scope: Scope, cfg: TaskSettings, file: TaskFile): Promise<boolean> {
   // 空文件不落盘，避免为每天都生成空清单
   const p = scopePath(scope, cfg)
-  if (!file.tasks.length && !(await window.api.exists(p))) return
-  await window.api.writeFile(p, serializeTaskFile(file))
+  if (!file.tasks.length && !(await window.api.exists(p))) return true
+  const text = serializeTaskFile(file)
+  const copy = await window.api.writeFileChecked(p, text, file.raw ?? null)
+  if (copy) {
+    toast(`「${p}」已在其他设备或外部被修改，未覆盖。本机版本已另存为「${copy}」，请对照合并`, 10000)
+    return false
+  }
+  file.raw = text
+  return true
 }
 
 export async function moveTask(task: Task, from: Scope, to: Scope, cfg: TaskSettings): Promise<void> {
@@ -63,8 +79,8 @@ export async function moveTask(task: Task, from: Scope, to: Scope, cfg: TaskSett
   const dst = await loadScope(to, cfg)
   src.tasks = src.tasks.filter((t) => t.id !== task.id && !sameTask(t, task))
   dst.tasks.push({ ...task })
-  await saveScope(to, cfg, dst)
-  await saveScope(from, cfg, src)
+  // 目标清单冲突时不从原清单移除，任务不会两头都丢
+  if (await saveScope(to, cfg, dst)) await saveScope(from, cfg, src)
 }
 
 /** 重新解析后 id 会变化，用内容判断是否为同一任务 */
@@ -95,7 +111,7 @@ export async function exportBuiltinTemplates(cfg: TaskSettings): Promise<string>
   return `${folder}/${BUILTIN_TEMPLATES[0].name}`
 }
 
-const LAST_TEMPLATE_KEY = 'labnote.lastTemplate'
+const LAST_TEMPLATE_KEY = 'kitenote.lastTemplate'
 
 /** 上次使用的模板名（设备本地记忆） */
 export function lastTemplateName(): string {

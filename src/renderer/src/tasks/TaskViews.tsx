@@ -49,7 +49,7 @@ export function TaskList({ scope, cfg, version, onOpenNote, compact, placeholder
     fn(next)
     setFile(next)
     try {
-      await saveScope(scope, cfg, next)
+      if (!(await saveScope(scope, cfg, next))) reload()
       onChanged?.()
     } catch (e) {
       toast(`保存失败：${e}`)
