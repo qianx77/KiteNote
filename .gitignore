@@ -3,3 +3,6 @@ out/
 release/
 *.log
 .cache/
+.claude/
+.env
+.env.*

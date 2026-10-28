@@ -4,8 +4,10 @@
   "version": "0.1.0",
   "description": "实验记录 + 每日/每周任务管理：To Do 式清单 + Obsidian 兼容的所见即所得 Markdown 笔记",
   "main": "out/main/index.js",
-  "author": "qianx77@126.com",
-  "license": "MIT",
+  "author": "qianx77 <qianx77@126.com>",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/qianx77/KiteNote",
+  "repository": "github:qianx77/KiteNote",
   "private": true,
   "scripts": {
     "dev": "electron-vite dev",
@@ -60,6 +62,7 @@
   "build": {
     "appId": "com.kitenote.app",
     "productName": "KiteNote",
+    "copyright": "Copyright © 2026 qianx77 <qianx77@126.com>",
     "electronDist": "node_modules/electron/dist",
     "directories": {
       "output": "release"

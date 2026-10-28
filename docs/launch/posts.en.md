@@ -1,4 +1,4 @@
-<!-- English posts. Replace <GitHub URL> before posting. Attach docs/images/*.png -->
+<!-- English posts. Attach docs/images/*.png -->
 
 # X / Twitter thread
 
@@ -8,7 +8,7 @@ I built KiteNote: a desktop app that connects your daily to-do list to your work
 To Do–style tasks → one click → a WYSIWYG Markdown note linked to the task.
 Plain .md files, works with your existing Obsidian vault. Open source.
 
-<GitHub URL>
+https://github.com/qianx77/KiteNote
 [note.png]
 
 **2/**
@@ -32,12 +32,13 @@ Copy a note into DingTalk / Lark / Word → images survive (inlined as base64).
 **5/**
 Obsidian compatible: [[links]], ![[embeds]], callouts, ==highlights==, math, and the Obsidian Tasks ⏫/✅ format.
 No account, no cloud. Sync with whatever you already use (Syncthing, OneDrive, Git…).
+If another machine changed a note while you were editing it, KiteNote saves your version as a conflict copy instead of overwriting.
 
 **6/**
-Electron + TipTap + markdown-it, MIT.
+Electron + TipTap + markdown-it, AGPL-3.0.
 Windows builds for now; the UI is Chinese-only (an English UI is next).
 Feedback and issues welcome 🙏
-<GitHub URL>
+https://github.com/qianx77/KiteNote
 
 ---
 
@@ -50,15 +51,16 @@ Feedback and issues welcome 🙏
 I'm an ML engineer. My to-dos lived in Microsoft To Do and my experiment logs in Obsidian, so weekly reviews meant cross-referencing two apps by hand. KiteNote merges the two:
 
 - To Do–style "My Day" and "This Week" views; tasks can have steps, notes and a "won't do" state with a reason.
-- One click turns a task into a templated note (goal / method / log / results / conclusion), linked both ways.
+- One click turns a task into a templated note (experiment, troubleshooting, meeting, general log, or your own template), linked both ways; a weekly report is one more click.
+- Tables get hover handles to insert, delete and align rows and columns, no pipe syntax.
 - A WYSIWYG editor (TipTap/ProseMirror) that reads and writes Obsidian-flavored Markdown: wikilinks, embeds, callouts, highlights, math, and the Obsidian Tasks emoji format. Tasks are also plain Markdown files (one per day or week).
 - Pasted images become attachments; copying out inlines images, so pasting into DingTalk, Lark or Word keeps them.
 
 The hardest part was a lossless Markdown round-trip, so that opening and editing a note doesn't mangle an Obsidian vault. I tested it against ~60 of my own notes. A few equivalent forms still get normalized (escapes, table padding, list indentation), and the editor warns you before saving when that would happen.
 
-No accounts and no server: the vault is a folder you sync however you like. Windows only for now, and the UI is Chinese (English is next). MIT.
+No accounts and no server: the vault is a folder you sync however you like. Saves check the file on disk first, so a note changed on another machine is never silently overwritten; your version becomes a conflict copy. Windows only for now, and the UI is Chinese (English is next). AGPL-3.0.
 
-<GitHub URL>
+https://github.com/qianx77/KiteNote
 
 ---
 
@@ -72,4 +74,4 @@ It opens your vault in place, with no import and no proprietary format. Tasks ar
 
 I'd love feedback from heavy Obsidian users: if any syntax you rely on gets changed on save, please open an issue with a sample.
 
-<GitHub URL>
+https://github.com/qianx77/KiteNote
