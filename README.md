@@ -104,6 +104,13 @@ node scripts/demo-shots.mjs   # 用虚构的演示库重新生成 docs/images �
 $env:ELECTRON_BUILDER_CACHE="$PWD\.cache\electron-builder"; $env:ELECTRON_BUILDER_BINARIES_MIRROR="https://npmmirror.com/mirrors/electron-builder-binaries/"; npm run dist
 ```
 
+打包会把产品名、版本和版权写进 exe 的「详细信息」，为此需要 winCodeSign 工具包。若报 `Cannot create symbolic link`（解压其中的 macOS 符号链接需要管理员权限），可以打开 Windows「开发者模式」，或手动解压一次（忽略那两个符号链接错误）后重新打包：
+
+```powershell
+cd .cache\electron-builder\winCodeSign
+..\..\..\node_modules\7zip-bin\win\x64\7za.exe x -y (Get-ChildItem *.7z | Select-Object -First 1).Name -owinCodeSign-2.6.0
+```
+
 ## 同步建议
 
 两台电脑交替使用（比如公司写工作、家里写个人）时：
